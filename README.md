@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TechBlog
+
+A mini developer blog platform built with **Next.js 16** showcasing App Router, Server/Client Components, Caching, Data Fetching, and more.
+
+## Features
+
+- 📝 **Blog** — Browse and read blog posts with dynamic routing
+- 💬 **Comments** — Add comments to blog posts
+- ❤️ **Likes** — Like/unlike posts
+- 🔍 **Search & Filter** — Search and filter blog posts
+- 📊 **Dashboard** — View blog analytics
+- 🔐 **Admin Panel** — Create, delete, and manage posts (with login/logout)
+- 🌱 **Seed API** — Seed the database with sample data
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS 4
+- **Database:** MongoDB (via Mongoose)
+- **React:** React 19
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- MongoDB instance (local or Atlas)
+
+### Installation
+
+```bash
+git clone https://github.com/anjali-sim/blog-app-next16.git
+cd blog-app-next16/my-app
+npm install
+```
+
+### Environment Variables
+
+Create a `.env.local` file in the `my-app` directory:
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+```
+
+### Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── page.tsx              # Home page
+├── blog/                 # Blog listing & individual post pages
+├── dashboard/            # Dashboard with analytics
+├── admin/                # Admin panel (create/delete posts, login)
+├── api/                  # API routes (posts, comments, seed)
+├── components/           # Shared UI components
+├── lib/                  # Database connection & models
+└── actions/              # Server actions
+```
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command         | Description              |
+| --------------- | ------------------------ |
+| `npm run dev`   | Start development server |
+| `npm run build` | Build for production     |
+| `npm start`     | Start production server  |
+| `npm run lint`  | Run ESLint               |
