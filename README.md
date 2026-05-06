@@ -1,6 +1,7 @@
 # TechBlog
 
 A mini developer blog platform built with **Next.js 16** showcasing App Router, Server/Client Components, Caching, Data Fetching, and more.
+🌐 **Live Demo:** (https://blog-app-next16.vercel.app/)
 
 ## Features
 
