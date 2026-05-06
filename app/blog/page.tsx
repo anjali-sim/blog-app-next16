@@ -6,17 +6,22 @@ import type { Post } from "../lib/data";
 
 // Data Fetching using "use cache" + cacheLife + cacheTag (v16 Cache Components)
 async function getPosts(query?: string): Promise<Post[]> {
-  const posts = await getCachedPosts(); // uses cached data layer
+  try {
+    const posts = await getCachedPosts(); // uses cached data layer
 
-  const filtered = query
-    ? posts.filter(
-        (p) =>
-          p.title.toLowerCase().includes(query.toLowerCase()) ||
-          p.body.toLowerCase().includes(query.toLowerCase()),
-      )
-    : posts;
+    const filtered = query
+      ? posts.filter(
+          (p) =>
+            p.title.toLowerCase().includes(query.toLowerCase()) ||
+            p.body.toLowerCase().includes(query.toLowerCase()),
+        )
+      : posts;
 
-  return filtered.slice(0, 12);
+    return filtered.slice(0, 12);
+  } catch (error) {
+    console.warn("Failed to fetch posts:", error);
+    return [];
+  }
 }
 
 // SEO metadata for this route

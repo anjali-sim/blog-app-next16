@@ -26,8 +26,16 @@ export async function generateMetadata({
 
 // generateStaticParams — Static Generation for known paths (Performance Optimization)
 export async function generateStaticParams() {
-  const posts = await getCachedPosts();
-  return posts.slice(0, 10).map((post) => ({ id: post._id }));
+  try {
+    const posts = await getCachedPosts();
+    if (posts && posts.length > 0) {
+      return posts.slice(0, 10).map((post) => ({ id: post._id }));
+    }
+  } catch (error) {
+    console.warn("Failed to generate static params:", error);
+  }
+  // Return at least one result for build validation (ISR will handle actual requests)
+  return [{ id: "placeholder" }];
 }
 
 export default async function BlogPostPage({

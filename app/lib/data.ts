@@ -37,9 +37,14 @@ export async function getCachedPosts(): Promise<Post[]> {
   cacheLife("hours"); // built-in profile: revalidate every hour
   cacheTag("posts"); // tag for on-demand revalidation
 
-  await connectDB();
-  const posts = await PostModel.find().sort({ createdAt: -1 }).lean();
-  return JSON.parse(JSON.stringify(posts));
+  try {
+    await connectDB();
+    const posts = await PostModel.find().sort({ createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(posts));
+  } catch (error) {
+    console.warn("Failed to fetch posts from DB:", error);
+    return [];
+  }
 }
 
 // Cached function: single post cached for 2 hours
@@ -48,10 +53,15 @@ export async function getCachedPost(id: string): Promise<Post | null> {
   cacheLife("hours");
   cacheTag(`post-${id}`);
 
-  await connectDB();
-  const post = await PostModel.findById(id).lean();
-  if (!post) return null;
-  return JSON.parse(JSON.stringify(post));
+  try {
+    await connectDB();
+    const post = await PostModel.findById(id).lean();
+    if (!post) return null;
+    return JSON.parse(JSON.stringify(post));
+  } catch (error) {
+    console.warn("Failed to fetch post from DB:", error);
+    return null;
+  }
 }
 
 // Cached function: comments cached with "days" profile
@@ -62,11 +72,16 @@ export async function getCachedComments(
   cacheLife("days"); // comments rarely change, cache longer
   cacheTag(`comments-${postId}`);
 
-  await connectDB();
-  const comments = await CommentModel.find({ postId })
-    .sort({ createdAt: -1 })
-    .lean();
-  return JSON.parse(JSON.stringify(comments));
+  try {
+    await connectDB();
+    const comments = await CommentModel.find({ postId })
+      .sort({ createdAt: -1 })
+      .lean();
+    return JSON.parse(JSON.stringify(comments));
+  } catch (error) {
+    console.warn("Failed to fetch comments from DB:", error);
+    return [];
+  }
 }
 
 // Cached function: stats using external API (users)
@@ -75,6 +90,11 @@ export async function getCachedUsers(): Promise<User[]> {
   cacheLife("max"); // cache as long as possible
   cacheTag("users");
 
-  const res = await fetch("https://jsonplaceholder.typicode.com/users");
-  return res.json();
+  try {
+    const res = await fetch("https://jsonplaceholder.typicode.com/users");
+    return res.json();
+  } catch (error) {
+    console.warn("Failed to fetch users:", error);
+    return [];
+  }
 }

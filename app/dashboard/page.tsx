@@ -8,11 +8,16 @@ export const metadata: Metadata = {
 
 // Server Component using cached data functions (use cache + cacheLife + cacheTag)
 async function getStats() {
-  const [posts, users] = await Promise.all([
-    getCachedPosts(),
-    getCachedUsers(),
-  ]);
-  return { totalPosts: posts.length, totalUsers: users.length };
+  try {
+    const [posts, users] = await Promise.all([
+      getCachedPosts(),
+      getCachedUsers(),
+    ]);
+    return { totalPosts: posts.length, totalUsers: users.length };
+  } catch (error) {
+    console.warn("Failed to fetch stats:", error);
+    return { totalPosts: 0, totalUsers: 0 };
+  }
 }
 
 export default async function DashboardPage() {

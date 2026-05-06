@@ -44,29 +44,34 @@ export async function createPost(formData: FormData) {
     return { error: "Unauthorized. Please login as admin." };
   }
 
-  await connectDB();
+  try {
+    await connectDB();
 
-  const title = formData.get("title") as string;
-  const body = formData.get("body") as string;
-  const author = (formData.get("author") as string) || "Anonymous";
-  const tagsRaw = formData.get("tags") as string;
-  const tags = tagsRaw
-    ? tagsRaw
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean)
-    : [];
+    const title = formData.get("title") as string;
+    const body = formData.get("body") as string;
+    const author = (formData.get("author") as string) || "Anonymous";
+    const tagsRaw = formData.get("tags") as string;
+    const tags = tagsRaw
+      ? tagsRaw
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : [];
 
-  if (!title || !body) {
-    return { error: "Title and body are required" };
+    if (!title || !body) {
+      return { error: "Title and body are required" };
+    }
+
+    const post = await Post.create({ title, body, author, tags });
+
+    // updateTag invalidates the cache for Server Actions (read-your-own-writes)
+    updateTag("posts");
+
+    return { success: true, postId: post._id.toString() };
+  } catch (error) {
+    console.error("Error creating post:", error);
+    return { error: "Failed to create post. Please try again." };
   }
-
-  const post = await Post.create({ title, body, author, tags });
-
-  // updateTag invalidates the cache for Server Actions (read-your-own-writes)
-  updateTag("posts");
-
-  return { success: true, postId: post._id.toString() };
 }
 
 export async function deletePost(postId: string) {
@@ -74,33 +79,43 @@ export async function deletePost(postId: string) {
     return { error: "Unauthorized" };
   }
 
-  await connectDB();
+  try {
+    await connectDB();
 
-  await Post.findByIdAndDelete(postId);
-  await Comment.deleteMany({ postId });
+    await Post.findByIdAndDelete(postId);
+    await Comment.deleteMany({ postId });
 
-  updateTag("posts");
-  updateTag(`post-${postId}`);
-  updateTag(`comments-${postId}`);
+    updateTag("posts");
+    updateTag(`post-${postId}`);
+    updateTag(`comments-${postId}`);
 
-  return { success: true };
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return { error: "Failed to delete post. Please try again." };
+  }
 }
 
 export async function createComment(formData: FormData) {
-  await connectDB();
+  try {
+    await connectDB();
 
-  const postId = formData.get("postId") as string;
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const body = formData.get("body") as string;
+    const postId = formData.get("postId") as string;
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const body = formData.get("body") as string;
 
-  if (!postId || !name || !email || !body) {
-    return { error: "All fields are required" };
+    if (!postId || !name || !email || !body) {
+      return { error: "All fields are required" };
+    }
+
+    await Comment.create({ postId, name, email, body });
+
+    updateTag(`comments-${postId}`);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    return { error: "Failed to create comment. Please try again." };
   }
-
-  await Comment.create({ postId, name, email, body });
-
-  updateTag(`comments-${postId}`);
-
-  return { success: true };
 }
